@@ -3,7 +3,7 @@ project(pybind11_practice)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory(pybind11)
+find_package(pybind11 REQUIRED)
 add_subdirectory(src/mylibs)
 add_subdirectory(src/mono-vo)
 
