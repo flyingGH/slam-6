@@ -36,6 +36,11 @@ class PinholeCamera:
         self.distortion = (abs(k1) > 0.0000001)
         self.d = [k1, k2, p1, p2, k3]
 
+    def get_camera_mat(self):
+        return np.array([[self.fx, 0, self.cx],
+                         [0, self.fy, self.cy],
+                         [0, 0, 1]])
+
 
 class VisualOdometry:
     def __init__(self, cam, annotations):
