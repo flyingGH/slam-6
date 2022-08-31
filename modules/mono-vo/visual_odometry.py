@@ -45,7 +45,7 @@ class PinholeCamera:
 class VisualOdometry:
     def __init__(self, cam, annotations):
         self.frame_stage = 0
-        self.cam = cam
+        self.cam: PinholeCamera = cam
         self.new_frame = None
         self.last_frame = None
         self.cur_R = None
@@ -78,16 +78,22 @@ class VisualOdometry:
 
     def process_second_frame(self):
         self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
-        e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
-                                           prob=0.999, threshold=1.0)
+        # e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
+        #                                    prob=0.999, threshold=1.0)
+        e_mat, mask = cv2.findEssentialMat(
+            self.px_cur, self.px_ref, cameraMatrix=self.cam.get_camera_mat(), method=cv2.RANSAC,
+            prob=0.999, threshold=1.0)
         _, self.cur_R, self.cur_t, mask = cv2.recoverPose(e_mat, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
         self.frame_stage = STAGE_DEFAULT_FRAME
         self.px_ref = self.px_cur
 
     def process_frame(self, frame_id):
         self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
-        e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
-                                           prob=0.999, threshold=1.0)
+        # e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
+        #                                    prob=0.999, threshold=1.0)
+        e_mat, mask = cv2.findEssentialMat(
+            self.px_cur, self.px_ref, cameraMatrix=self.cam.get_camera_mat(), method=cv2.RANSAC,
+            prob=0.999, threshold=1.0)
         _, rot_mat, t, mask = cv2.recoverPose(e_mat, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
         absolute_scale = self.get_absolute_scale(frame_id)
         if absolute_scale > 0.1:
