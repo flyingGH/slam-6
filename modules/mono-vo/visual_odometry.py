@@ -78,21 +78,21 @@ class VisualOdometry:
 
     def process_second_frame(self):
         self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
-        E, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
-                                       prob=0.999, threshold=1.0)
-        _, self.cur_R, self.cur_t, mask = cv2.recoverPose(E, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
+        e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
+                                           prob=0.999, threshold=1.0)
+        _, self.cur_R, self.cur_t, mask = cv2.recoverPose(e_mat, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
         self.frame_stage = STAGE_DEFAULT_FRAME
         self.px_ref = self.px_cur
 
     def process_frame(self, frame_id):
         self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
-        E, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
-                                       prob=0.999, threshold=1.0)
-        _, R, t, mask = cv2.recoverPose(E, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
+        e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
+                                           prob=0.999, threshold=1.0)
+        _, rot_mat, t, mask = cv2.recoverPose(e_mat, self.px_cur, self.px_ref, focal=self.focal, pp=self.pp)
         absolute_scale = self.get_absolute_scale(frame_id)
         if absolute_scale > 0.1:
             self.cur_t = self.cur_t + absolute_scale * self.cur_R.dot(t)
-            self.cur_R = R.dot(self.cur_R)
+            self.cur_R = rot_mat.dot(self.cur_R)
         if self.px_ref.shape[0] < kMinNumFeature:
             self.px_cur = self.detector.detect(self.new_frame)
             self.px_cur = np.array([x.pt for x in self.px_cur], dtype=np.float32)
