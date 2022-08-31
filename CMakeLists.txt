@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.21)
+project(pybind11_practice)
+
+set(CMAKE_CXX_STANDARD 11)
+
+add_subdirectory(pybind11)
+add_subdirectory(src/mylibs)
+add_subdirectory(src/mono-vo)
+
