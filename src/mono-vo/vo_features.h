@@ -27,7 +27,7 @@ THE SOFTWARE.
 
 
 #include <iostream>
-#include <ctype.h>
+#include <cctype>
 #include <algorithm> // for copy
 #include <iterator> // for ostream_iterator
 #include <vector>
@@ -39,26 +39,37 @@ THE SOFTWARE.
 using namespace cv;
 using namespace std;
 
-void featureTracking(Mat img_1, Mat img_2, vector<Point2f> &points1, vector<Point2f> &points2, vector<uchar> &status) {
-
-//this function automatically gets rid of points for which tracking fails
-
+/**
+ * calc optical flow and remove outliers
+ * @param img_1 previous image
+ * @param img_2 current image
+ * @param points1 previous feature points
+ * @param points2 current feature points
+ * @param status valid statuses for optical flows
+ */
+void featureTracking(const Mat &img_1, const Mat &img_2, vector<Point2f> &points1, vector<Point2f> &points2,
+                     vector<uchar> &status) {
+    //this function automatically gets rid of points for which tracking fails
     vector<float> err;
     Size winSize = Size(21, 21);
-    TermCriteria termcrit = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 30, 0.01);
-
-    calcOpticalFlowPyrLK(img_1, img_2, points1, points2, status, err, winSize, 3, termcrit, 0, 0.001);
+    TermCriteria criteria = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 30, 0.01);
+    calcOpticalFlowPyrLK(img_1, img_2, points1, points2,
+                         status, err, winSize, 3, criteria, 0, 0.001);
 
     //getting rid of points for which the KLT tracking failed or those who have gone outside the frame
     int indexCorrection = 0;
     for (int i = 0; i < status.size(); i++) {
         Point2f pt = points2.at(i - indexCorrection);
+        // invalid optical flow or outside the frame
         if ((status.at(i) == 0) || (pt.x < 0) || (pt.y < 0)) {
             if ((pt.x < 0) || (pt.y < 0)) {
+                // define outside points also as invalid
                 status.at(i) = 0;
             }
+            // remove from feature points list
             points1.erase(points1.begin() + (i - indexCorrection));
             points2.erase(points2.begin() + (i - indexCorrection));
+            // shift index because of remove points
             indexCorrection++;
         }
 
@@ -66,11 +77,17 @@ void featureTracking(Mat img_1, Mat img_2, vector<Point2f> &points1, vector<Poin
 
 }
 
-
-void featureDetection(Mat img_1, vector<Point2f> &points1) {   //uses FAST as of now, modify parameters as necessary
-    vector<KeyPoint> keypoints_1;
+/**
+ * detect feature points using FAST algorithm
+ * @param img_1 target image (input)
+ * @param points1 feature points (output)
+ */
+void featureDetection(const Mat &img_1, vector<Point2f> &points1) {
+    //uses FAST as of now, modify parameters as necessary
     int fast_threshold = 20;
-    bool nonmaxSuppression = true;
-    FAST(img_1, keypoints_1, fast_threshold, nonmaxSuppression);
-    KeyPoint::convert(keypoints_1, points1, vector<int>());
+    bool non_max_suppression = true;
+    vector<KeyPoint> key_points_1;
+    FAST(img_1, key_points_1, fast_threshold, non_max_suppression);
+
+    KeyPoint::convert(key_points_1, points1, vector<int>());
 }
