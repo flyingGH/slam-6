@@ -37,7 +37,7 @@ const cv::Point2d pp(607.1928, 185.2157);
 // IMP: Change the file directories (4 places) according to where your dataset is saved before running!
 
 double getAbsoluteScale(int frame_id) {
-    ifstream my_file(root_path + "/data_odometry_poses/dataset/poses/00.txt");
+    ifstream my_file(root_path + "/poses/00.txt");
     // read line buffer
     string line;
     // read line number
@@ -70,8 +70,8 @@ double getAbsoluteScale(int frame_id) {
 }
 
 void initialize_images(Mat &prevImage, Mat &currImage) {
-    const string filename1(root_path + "/data_odometry_color/dataset/sequences/00/image_2/000000.png");
-    const string filename2(root_path + "/data_odometry_color/dataset/sequences/00/image_2/000001.png");
+    const string filename1(root_path + "/sequences/00/image_2/000000.png");
+    const string filename2(root_path + "/sequences/00/image_2/000001.png");
 
     //read the first two frames from the dataset
     const Mat img_1_c = imread(filename1);
@@ -87,11 +87,9 @@ void initialize_images(Mat &prevImage, Mat &currImage) {
 }
 
 void write_trajectory(const Mat &t_f, Mat &traj) {
-
     const int x = int(t_f.at<double>(0)) + 300;
     const int y = int(t_f.at<double>(2)) + 100;
     circle(traj, Point(x, y), 1, CV_RGB(255, 0, 0), 2);
-
 
     rectangle(traj, Point(10, 30), Point(550, 50), CV_RGB(0, 0, 0), FILLED);
 
@@ -137,7 +135,7 @@ int main(int argc, char **argv) {
     Mat traj = Mat::zeros(600, 600, CV_8UC3);
     for (int numFrame = 2; numFrame < MAX_FRAME; numFrame++) {
         string filename = root_path;
-        filename += (boost::format("/data_odometry_color/dataset/sequences/00/image_2/%06d.png") % numFrame).str();
+        filename += (boost::format("/sequences/00/image_2/%06d.png") % numFrame).str();
         cout << numFrame << endl;
 
         const Mat currImage_c = imread(filename);

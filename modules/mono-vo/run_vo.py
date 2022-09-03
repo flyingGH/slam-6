@@ -10,13 +10,13 @@ from visual_odometry import PinholeCamera, VisualOdometry
 def main():
     root_path = "/mnt/d/datasets/KITTI/odometry"
     cam = PinholeCamera(width=1241.0, height=376.0, fx=718.8560, fy=718.8560, cx=607.1928, cy=185.2157)
-    vo = VisualOdometry(cam, f'{root_path}/data_odometry_poses/dataset/poses/00.txt')
+    vo = VisualOdometry(cam, f'{root_path}/poses/00.txt')
 
     # image for trajectory drawing
     traj = np.zeros((600, 600, 3), dtype=np.uint8)
 
     for img_id in range(4541):
-        img = cv2.imread(f'{root_path}/dataset/sequences/00/image_0/{str(img_id).zfill(6)}.png', 0)
+        img = cv2.imread(f'{root_path}/sequences/00/image_0/{str(img_id).zfill(6)}.png', cv2.IMREAD_GRAYSCALE)
 
         vo.update(img, img_id)
 
