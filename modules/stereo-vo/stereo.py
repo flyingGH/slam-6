@@ -12,9 +12,9 @@ def pixel2point(u, v, disparity, calib_mat):
 
 
 def triangulation(left_key_points, right_key_points, calib_matrix):
-    disparity = np.array([left_pt.pt[0] - right_pt.pt[0]
+    disparity = np.array([left_pt[0] - right_pt[0]
                           for left_pt, right_pt in zip(left_key_points, right_key_points)])
-    landmarks = np.array([pixel2point(*left_pt.pt, left_pt.pt[0] - right_pt.pt[0], calib_matrix)
+    landmarks = np.array([pixel2point(*left_pt, left_pt[0] - right_pt[0], calib_matrix)
                           for left_pt, right_pt in zip(left_key_points, right_key_points)])
 
     is_valid = np.where((10 <= disparity) & (disparity <= 96), True, False)
@@ -37,7 +37,7 @@ class StereoEstimator:
         disparity_image = disparity_image / 16
         return disparity_image
 
-    def get_point_cloud(self, left_image, right_image, calib_matrix, draw=False):
+    def images2points(self, left_image, right_image, calib_matrix, draw=False):
         disparity_image = self.get_disparity(left_image, right_image)
         points = np.array([
             (*pixel2point(col, row, disparity_image[row, col], calib_matrix), left_image[row, col] / 255)
@@ -46,9 +46,9 @@ class StereoEstimator:
             if 10 <= disparity_image[row, col] <= 96
         ])
 
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(points[:, :3])
-        pcd.colors = o3d.utility.Vector3dVector(np.tile(points[:, 3], (3, 1)).T)
         if draw:
+            pcd = o3d.geometry.PointCloud()
+            pcd.points = o3d.utility.Vector3dVector(points[:, :3])
+            pcd.colors = o3d.utility.Vector3dVector(np.tile(points[:, 3], (3, 1)).T)
             o3d.visualization.draw_geometries([pcd])
-        return pcd
+        return points

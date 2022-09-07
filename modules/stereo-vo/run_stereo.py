@@ -3,8 +3,9 @@ import os
 import cv2
 import open3d as o3d
 import pandas as pd
-import stereo_cv
-import odometry
+import numpy as np
+import stereo
+import tracking
 
 
 def read_calib_matrices(calib_path):
@@ -24,17 +25,24 @@ def demo_stereo_matching():
     left_image = cv2.imread(left_image_path, cv2.IMREAD_GRAYSCALE)
     right_image = cv2.imread(right_image_path, cv2.IMREAD_GRAYSCALE)
 
-    matcher = odometry.ImageMatcher()
-    left_key_points, right_key_points = matcher.get_matches(left_image, right_image, draw=False)
-    left_key_points, right_key_points, landmarks = stereo_cv.triangulation(
+    left_key_points, right_key_points = tracking.feature_tracking(
+        left_image, right_image, key_points_1=None, draw=True)
+    left_key_points, right_key_points = tracking.direct_tracking(
+        left_image, right_image, key_points_1=None, draw=True)
+
+    left_key_points, right_key_points, landmarks = stereo.triangulation(
         left_key_points, right_key_points, calib_matrices[1])
 
-    stereo_estimator = stereo_cv.StereoEstimator()
-    pcd = stereo_estimator.get_point_cloud(left_image, right_image, calib_matrices[1], draw=False)
+    stereo_estimator = stereo.StereoEstimator()
+    points = stereo_estimator.images2points(left_image, right_image, calib_matrices[1], draw=False)
 
     landmark_pcd = o3d.geometry.PointCloud()
     landmark_pcd.points = o3d.utility.Vector3dVector(landmarks)
     landmark_pcd.paint_uniform_color((1, 0, 0))
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points[:, :3])
+    pcd.colors = o3d.utility.Vector3dVector(np.tile(points[:, 3], (3, 1)).T)
+    
     o3d.visualization.draw_geometries([pcd, landmark_pcd])
 
 
