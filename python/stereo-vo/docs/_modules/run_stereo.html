@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>run_stereo &mdash; stereo-vo  ドキュメント</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/translations.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> stereo-vo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stereo-vo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">run_stereo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>run_stereo のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">stereo</span>
+<span class="kn">import</span> <span class="nn">tracking</span>
+
+
+<div class="viewcode-block" id="read_calib_matrices"><a class="viewcode-back" href="../run_stereo.html#run_stereo.read_calib_matrices">[ドキュメント]</a><span class="k">def</span> <span class="nf">read_calib_matrices</span><span class="p">(</span><span class="n">calib_path</span><span class="p">):</span>
+    <span class="n">calib_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">calib_path</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">calib_matrices</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">calib_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">calib_matrices</span></div>
+
+
+<div class="viewcode-block" id="demo_stereo_matching"><a class="viewcode-back" href="../run_stereo.html#run_stereo.demo_stereo_matching">[ドキュメント]</a><span class="k">def</span> <span class="nf">demo_stereo_matching</span><span class="p">():</span>
+    <span class="n">root_path</span> <span class="o">=</span> <span class="s2">&quot;D:/datasets/KITTI/odometry&quot;</span>
+    <span class="n">left_image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;sequences/00/image_0/000000.png&quot;</span><span class="p">)</span>
+    <span class="n">right_image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;sequences/00/image_1/000000.png&quot;</span><span class="p">)</span>
+
+    <span class="n">calib_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;sequences/00/calib.txt&quot;</span><span class="p">)</span>
+    <span class="n">calib_matrices</span> <span class="o">=</span> <span class="n">read_calib_matrices</span><span class="p">(</span><span class="n">calib_path</span><span class="p">)</span>
+
+    <span class="n">left_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">left_image_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+    <span class="n">right_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">right_image_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+
+    <span class="n">left_key_points</span><span class="p">,</span> <span class="n">right_key_points</span> <span class="o">=</span> <span class="n">tracking</span><span class="o">.</span><span class="n">feature_tracking</span><span class="p">(</span>
+        <span class="n">left_image</span><span class="p">,</span> <span class="n">right_image</span><span class="p">,</span> <span class="n">key_points_1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">draw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">left_key_points</span><span class="p">,</span> <span class="n">right_key_points</span> <span class="o">=</span> <span class="n">tracking</span><span class="o">.</span><span class="n">direct_tracking</span><span class="p">(</span>
+        <span class="n">left_image</span><span class="p">,</span> <span class="n">right_image</span><span class="p">,</span> <span class="n">key_points_1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">draw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">left_key_points</span><span class="p">,</span> <span class="n">right_key_points</span><span class="p">,</span> <span class="n">landmarks</span> <span class="o">=</span> <span class="n">stereo</span><span class="o">.</span><span class="n">triangulation</span><span class="p">(</span>
+        <span class="n">left_key_points</span><span class="p">,</span> <span class="n">right_key_points</span><span class="p">,</span> <span class="n">calib_matrices</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">stereo_estimator</span> <span class="o">=</span> <span class="n">stereo</span><span class="o">.</span><span class="n">StereoEstimator</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">stereo_estimator</span><span class="o">.</span><span class="n">images2points</span><span class="p">(</span><span class="n">left_image</span><span class="p">,</span> <span class="n">right_image</span><span class="p">,</span> <span class="n">calib_matrices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">draw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">landmark_pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+    <span class="n">landmark_pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
+    <span class="n">landmark_pcd</span><span class="o">.</span><span class="n">paint_uniform_color</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">pcd</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">PointCloud</span><span class="p">()</span>
+    <span class="n">pcd</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">pcd</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">utility</span><span class="o">.</span><span class="n">Vector3dVector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    
+    <span class="n">o3d</span><span class="o">.</span><span class="n">visualization</span><span class="o">.</span><span class="n">draw_geometries</span><span class="p">([</span><span class="n">pcd</span><span class="p">,</span> <span class="n">landmark_pcd</span><span class="p">])</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">demo_stereo_matching</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, applejxd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

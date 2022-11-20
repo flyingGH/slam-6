@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>My Project: vo_features.h ソースファイル</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">My Project
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 構築: Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'検索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','検索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">vo_features.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="vo__features_8h.html">[詳解]</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* from https://github.com/avisingh599/mono-vo */</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">The MIT License</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">Copyright (c) 2015 Avi Singh</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">Permission is hereby granted, free of charge, to any person obtaining a copy</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">of this software and associated documentation files (the &quot;Software&quot;), to deal</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">in the Software without restriction, including without limitation the rights</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">copies of the Software, and to permit persons to whom the Software is</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">furnished to do so, subject to the following conditions:</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">The above copyright notice and this permission notice shall be included in</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">all copies or substantial portions of the Software.</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">THE SOFTWARE.</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;opencv2/video/tracking.hpp&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;opencv2/imgproc/imgproc.hpp&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;opencv2/highgui/highgui.hpp&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;opencv2/features2d/features2d.hpp&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;opencv2/calib3d/calib3d.hpp&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;cctype&gt;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span> <span class="comment">// for copy</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;iterator&gt;</span> <span class="comment">// for ostream_iterator</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;ctime&gt;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">using namespace </span>cv;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">using namespace </span>std;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="vo__features_8h.html#a16c8d25f9308283a40ed5042ba57b5b5">   50</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="vo__features_8h.html#a16c8d25f9308283a40ed5042ba57b5b5">featureTracking</a>(<span class="keyword">const</span> Mat &amp;img_1, <span class="keyword">const</span> Mat &amp;img_2, vector&lt;Point2f&gt; &amp;points1, vector&lt;Point2f&gt; &amp;points2,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                     vector&lt;uchar&gt; &amp;status) {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">//this function automatically gets rid of points for which tracking fails</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    vector&lt;float&gt; err;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    Size winSize = Size(21, 21);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    TermCriteria criteria = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 30, 0.01);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    calcOpticalFlowPyrLK(img_1, img_2, points1, points2,</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                         status, err, winSize, 3, criteria, 0, 0.001);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//getting rid of points for which the KLT tracking failed or those who have gone outside the frame</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">int</span> indexCorrection = 0;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; status.size(); i++) {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        Point2f pt = points2.at(i - indexCorrection);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="comment">// invalid optical flow or outside the frame</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">if</span> ((status.at(i) == 0) || (pt.x &lt; 0) || (pt.y &lt; 0)) {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <span class="keywordflow">if</span> ((pt.x &lt; 0) || (pt.y &lt; 0)) {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <span class="comment">// define outside points also as invalid</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                status.at(i) = 0;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            <span class="comment">// remove from feature points list</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            points1.erase(points1.begin() + (i - indexCorrection));</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            points2.erase(points2.begin() + (i - indexCorrection));</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <span class="comment">// shift index because of remove points</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            indexCorrection++;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="vo__features_8h.html#a67e8c6795b0ad03ffa50147c4742e103">   85</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="vo__features_8h.html#a67e8c6795b0ad03ffa50147c4742e103">featureDetection</a>(<span class="keyword">const</span> Mat &amp;img_1, vector&lt;Point2f&gt; &amp;points1) {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="comment">//uses FAST as of now, modify parameters as necessary</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordtype">int</span> fast_threshold = 20;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordtype">bool</span> non_max_suppression = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    vector&lt;KeyPoint&gt; key_points_1;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    FAST(img_1, key_points_1, fast_threshold, non_max_suppression);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    KeyPoint::convert(key_points_1, points1, vector&lt;int&gt;());</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
+</div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="avisodo_8cpp_html_a6d756aeb57ba9f118b8b3abccd8634e2"><div class="ttname"><a href="visodo_8cpp.html#a6d756aeb57ba9f118b8b3abccd8634e2">write_trajectory</a></div><div class="ttdeci">void write_trajectory(const Mat &amp;t_f, Mat &amp;traj)</div><div class="ttdef"><b>Definition:</b> visodo.cpp:89</div></div>
+<div class="ttc" id="avo__features_8h_html"><div class="ttname"><a href="vo__features_8h.html">vo_features.h</a></div></div>
+<div class="ttc" id="avisodo_8cpp_html_a3c04138a5bfe5d72780bb7e82a18e627"><div class="ttname"><a href="visodo_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a></div><div class="ttdeci">int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> visodo.cpp:106</div></div>
+<div class="ttc" id="avisodo_8cpp_html_aa071bf2646bbfdfed62706749c087aaa"><div class="ttname"><a href="visodo_8cpp.html#aa071bf2646bbfdfed62706749c087aaa">getAbsoluteScale</a></div><div class="ttdeci">double getAbsoluteScale(int frame_id)</div><div class="ttdef"><b>Definition:</b> visodo.cpp:39</div></div>
+<div class="ttc" id="avo__features_8h_html_a67e8c6795b0ad03ffa50147c4742e103"><div class="ttname"><a href="vo__features_8h.html#a67e8c6795b0ad03ffa50147c4742e103">featureDetection</a></div><div class="ttdeci">void featureDetection(const Mat &amp;img_1, vector&lt; Point2f &gt; &amp;points1)</div><div class="ttdef"><b>Definition:</b> vo_features.h:85</div></div>
+<div class="ttc" id="avisodo_8cpp_html_a60ea19d7a171c9994164b0f9901652b2"><div class="ttname"><a href="visodo_8cpp.html#a60ea19d7a171c9994164b0f9901652b2">initialize_images</a></div><div class="ttdeci">void initialize_images(Mat &amp;prevImage, Mat &amp;currImage)</div><div class="ttdef"><b>Definition:</b> visodo.cpp:72</div></div>
+<div class="ttc" id="avisodo_8cpp_html_a7c23e3fee986bd5d251347963dbb217e"><div class="ttname"><a href="visodo_8cpp.html#a7c23e3fee986bd5d251347963dbb217e">root_path</a></div><div class="ttdeci">const string root_path</div><div class="ttdef"><b>Definition:</b> visodo.cpp:30</div></div>
+<div class="ttc" id="avisodo_8cpp_html_aa7728d4ee061abdd768689bdd011434c"><div class="ttname"><a href="visodo_8cpp.html#aa7728d4ee061abdd768689bdd011434c">pp</a></div><div class="ttdeci">const cv::Point2d pp(607.1928, 185.2157)</div></div>
+<div class="ttc" id="aCMakeLists_8txt_html_a1af68db55d33bbbcabab1a8438e05196"><div class="ttname"><a href="CMakeLists_8txt.html#a1af68db55d33bbbcabab1a8438e05196">find_package</a></div><div class="ttdeci">find_package(OpenCV 4.2 REQUIRED) include_directories($</div><div class="ttdef"><b>Definition:</b> CMakeLists.txt:1</div></div>
+<div class="ttc" id="avisodo_8cpp_html_a3ed6014522b8bcffe2a58c708e6c562e"><div class="ttname"><a href="visodo_8cpp.html#a3ed6014522b8bcffe2a58c708e6c562e">MIN_NUM_FEAT</a></div><div class="ttdeci">const int MIN_NUM_FEAT</div><div class="ttdef"><b>Definition:</b> visodo.cpp:29</div></div>
+<div class="ttc" id="avisodo_8cpp_html_aacebe2015ac46c0b07fa78ca3dbc5778"><div class="ttname"><a href="visodo_8cpp.html#aacebe2015ac46c0b07fa78ca3dbc5778">focal</a></div><div class="ttdeci">const double focal</div><div class="ttdef"><b>Definition:</b> visodo.cpp:34</div></div>
+<div class="ttc" id="avo__features_8h_html_a16c8d25f9308283a40ed5042ba57b5b5"><div class="ttname"><a href="vo__features_8h.html#a16c8d25f9308283a40ed5042ba57b5b5">featureTracking</a></div><div class="ttdeci">void featureTracking(const Mat &amp;img_1, const Mat &amp;img_2, vector&lt; Point2f &gt; &amp;points1, vector&lt; Point2f &gt; &amp;points2, vector&lt; uchar &gt; &amp;status)</div><div class="ttdef"><b>Definition:</b> vo_features.h:50</div></div>
+<div class="ttc" id="aCMakeLists_8txt_html_a0257060f3ca09992a7e4cde908161b31"><div class="ttname"><a href="CMakeLists_8txt.html#a0257060f3ca09992a7e4cde908161b31">file</a></div><div class="ttdeci">file(GLOB viso &quot;*.h&quot; &quot;*.cpp&quot;) add_executable(vo $</div><div class="ttdef"><b>Definition:</b> CMakeLists.txt:5</div></div>
+<div class="ttc" id="avisodo_8cpp_html_a8840f7571d04b93643f69180ee95e044"><div class="ttname"><a href="visodo_8cpp.html#a8840f7571d04b93643f69180ee95e044">MAX_FRAME</a></div><div class="ttdeci">const int MAX_FRAME</div><div class="ttdef"><b>Definition:</b> visodo.cpp:28</div></div>
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+構築: &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.17
+</small></address>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tracking &mdash; stereo-vo  ドキュメント</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/translations.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> stereo-vo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stereo-vo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">tracking</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>tracking のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="n">_detector</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">ORB_create</span><span class="p">()</span>
+<span class="n">_matcher</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BFMatcher</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">NORM_HAMMING</span><span class="p">,</span> <span class="n">crossCheck</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="feature_tracking"><a class="viewcode-back" href="../tracking.html#tracking.feature_tracking">[ドキュメント]</a><span class="k">def</span> <span class="nf">feature_tracking</span><span class="p">(</span><span class="n">image_1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">image_2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                     <span class="n">key_points_1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">KeyPoint</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">draw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calc matched keypoints</span>
+
+<span class="sd">    :param image_1: previous image mat</span>
+<span class="sd">    :param image_2: current image mat</span>
+<span class="sd">    :param key_points_1: feature points of previous image</span>
+<span class="sd">    :param draw: draw results or not</span>
+<span class="sd">    :return: start points and end points of optical flow</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">key_points_1</span><span class="p">:</span>
+        <span class="n">key_points_1</span><span class="p">,</span> <span class="n">descriptors_1</span> <span class="o">=</span> <span class="n">_detector</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">image_1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">descriptors_1</span> <span class="o">=</span> <span class="n">_detector</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">image_1</span><span class="p">,</span> <span class="n">key_points_1</span><span class="p">)</span>
+    <span class="n">key_points_2</span><span class="p">,</span> <span class="n">descriptors_2</span> <span class="o">=</span> <span class="n">_detector</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">image_2</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># left_image_w_key_points = cv2.drawKeypoints(image_1, key_points_1,</span>
+    <span class="c1">#                                             outImage=None, color=(0, 255, 0), flags=0)</span>
+
+    <span class="n">matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">descriptors_1</span><span class="p">,</span> <span class="n">descriptors_2</span><span class="p">))</span>
+
+    <span class="c1"># remove outliers</span>
+    <span class="n">matches</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">&quot;distance&quot;</span><span class="p">))</span>
+    <span class="n">min_distance</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distance</span>
+    <span class="c1"># min_distance = min(matches, key=operator.attrgetter(&quot;distance&quot;)).distance</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">distance</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">min_distance</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">matches</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">draw</span><span class="p">:</span>
+        <span class="n">match_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">drawMatches</span><span class="p">(</span><span class="n">image_1</span><span class="p">,</span> <span class="n">key_points_1</span><span class="p">,</span> <span class="n">image_2</span><span class="p">,</span> <span class="n">key_points_2</span><span class="p">,</span>
+                                      <span class="n">matches</span><span class="p">,</span> <span class="n">outImg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;result of feature matching&quot;</span><span class="p">,</span> <span class="n">match_image</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+    <span class="n">key_points_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">key_points_1</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">queryIdx</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">])</span>
+    <span class="n">key_points_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">key_points_2</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">trainIdx</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">key_points_1</span><span class="p">,</span> <span class="n">key_points_2</span></div>
+
+
+<div class="viewcode-block" id="direct_tracking"><a class="viewcode-back" href="../tracking.html#tracking.direct_tracking">[ドキュメント]</a><span class="k">def</span> <span class="nf">direct_tracking</span><span class="p">(</span><span class="n">image_1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">image_2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                    <span class="n">key_points_1</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">draw</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calc optical flow</span>
+
+<span class="sd">    :param image_1: previous image mat</span>
+<span class="sd">    :param image_2: current image mat</span>
+<span class="sd">    :param key_points_1: feature points of previous image</span>
+<span class="sd">    :param draw: draw results or not</span>
+<span class="sd">    :return: start points and end points of optical flow</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">key_points_1</span><span class="p">:</span>
+        <span class="c1"># params for Shi-Tomasi corner detection</span>
+        <span class="n">feature_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">maxCorners</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">qualityLevel</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">minDistance</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">blockSize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">key_points_1</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">goodFeaturesToTrack</span><span class="p">(</span><span class="n">image_1</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">feature_params</span><span class="p">)</span>
+        <span class="n">key_points_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">key_points_1</span><span class="p">])</span>
+    <span class="c1"># parameters for optical flow</span>
+    <span class="n">lk_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">winSize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
+                     <span class="c1"># maxLevel = 3,</span>
+                     <span class="n">criteria</span><span class="o">=</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">|</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_COUNT</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">))</span>
+    <span class="c1"># shape: [k,2] [k,1] [k,1]</span>
+    <span class="n">key_points_2</span><span class="p">,</span> <span class="n">statuses</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">calcOpticalFlowPyrLK</span><span class="p">(</span>
+        <span class="n">image_1</span><span class="p">,</span> <span class="n">image_2</span><span class="p">,</span> <span class="n">prevPts</span><span class="o">=</span><span class="n">key_points_1</span><span class="p">,</span> <span class="n">nextPts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">lk_params</span><span class="p">)</span>
+    <span class="c1"># bool list for optical flow (same length with px_ref)</span>
+    <span class="n">statuses</span> <span class="o">=</span> <span class="n">statuses</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">statuses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># extract feature points as start points of optical flows</span>
+    <span class="n">key_points_1</span> <span class="o">=</span> <span class="n">key_points_1</span><span class="p">[</span><span class="n">statuses</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># extract feature points as end points of optical flows</span>
+    <span class="n">key_points_2</span> <span class="o">=</span> <span class="n">key_points_2</span><span class="p">[</span><span class="n">statuses</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">draw</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image_1</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGRA</span><span class="p">))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="c1"># draw the tracks</span>
+        <span class="n">result_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">image_2</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGRA</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">old</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">key_points_2</span><span class="p">,</span> <span class="n">key_points_1</span><span class="p">)):</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)),</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)),</span> <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">result_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">result_image</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)),</span> <span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">result_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">result_image</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;optical flow&quot;</span><span class="p">,</span> <span class="n">result_image</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">()</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">key_points_1</span><span class="p">,</span> <span class="n">key_points_2</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, applejxd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
