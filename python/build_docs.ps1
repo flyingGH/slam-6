@@ -10,6 +10,9 @@ Set-Location $ScriptDir
 if (-Not(Get-Command dot -ea SilentlyContinue)) {
     winget install Graphviz.Graphviz
     $env:Path+=";C:\Program Files\Graphviz\bin"
+
+#    $NewPath="C:\Program Files\Graphviz\bin"
+#    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $NewPath, "User")
 }
 
 # フォルダの有無で初期化実行
