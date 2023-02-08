@@ -11,8 +11,8 @@ if (-Not(Get-Command dot -ea SilentlyContinue)) {
     winget install Graphviz.Graphviz
     $env:Path+=";C:\Program Files\Graphviz\bin"
 
-    $NewPath="C:\Progra~1\Graphviz\bin"
-    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $NewPath, "User")
+#    $NewPath="C:\Progra~1\Graphviz\bin"
+#    sudo [Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $NewPath, "Sys")
 }
 
 # フォルダの有無で初期化実行

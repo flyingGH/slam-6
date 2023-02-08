@@ -19,7 +19,8 @@ lk_params = dict(winSize=(21, 21),
                  criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01))
 
 
-def feature_tracking(image_ref, image_cur, px_ref):
+def feature_tracking(image_ref: np.ndarray, image_cur: np.ndarray, px_ref: np.ndarray)\
+        -> Tuple[np.ndarray, np.ndarray]:
     """
     calc optical flow
 

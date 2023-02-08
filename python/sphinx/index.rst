@@ -10,6 +10,10 @@ Welcome to slam-practice's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   link_readme
+   mono_vo
+   stereo_vo
+
 
 
 Indices and tables

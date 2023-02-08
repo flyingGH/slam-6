@@ -1,0 +1,9 @@
+numpy
+pandas
+
+opencv-python
+open3d
+
+sphinx
+sphinx-rtd-theme
+sphinx-mdinclude
