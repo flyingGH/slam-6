@@ -11,15 +11,22 @@ if (-Not(Get-Command dot -ea SilentlyContinue)) {
     winget install Graphviz.Graphviz
     $env:Path+=";C:\Program Files\Graphviz\bin"
 
-#    $NewPath="C:\Program Files\Graphviz\bin"
-#    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $NewPath, "User")
+    $NewPath="C:\Progra~1\Graphviz\bin"
+    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";" + $NewPath, "User")
 }
 
 # フォルダの有無で初期化実行
 if (-Not(Test-Path $ScriptDir\sphinx)) {
-    sphinx-quickstart sphinx
+    $ProjectName = Convert-Path $ScriptDir\.. | Split-Path -Leaf
+    sphinx-quickstart -q -p $ProjectName -a applejxd -v 0.1 -l ja sphinx
 }
 
 # ドキュメント生成
 sphinx-apidoc -e -f -o $ScriptDir\sphinx .
 sphinx-build -a $ScriptDir\sphinx $ScriptDir\docs
+
+#if (-Not(Get-Command latexmk -ea SilentlyContinue)) {
+#    sudo choco install texlive -y
+#}
+#Set-Location $ScriptDir\sphinx
+#make latexpdf
