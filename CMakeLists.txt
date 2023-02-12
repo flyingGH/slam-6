@@ -3,7 +3,10 @@ project(slam-practice)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(PYTHON_EXECUTABLE )
+
 find_package(pybind11 REQUIRED)
-add_subdirectory(mylibs)
-add_subdirectory(mono-vo)
-add_subdirectory(samples)
+
+add_subdirectory(cpp/mylibs)
+add_subdirectory(cpp/mono-vo)
+add_subdirectory(cpp/samples)

@@ -1,4 +1,4 @@
-from src import mylibs
+from lib import mylibs
 
 
 def main():

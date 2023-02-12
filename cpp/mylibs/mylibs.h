@@ -14,7 +14,7 @@ public:
     int sum;
 
     POINT(int x, int y) { this->x = x; this->y = y; this->sum = x+y; }
-    int X() { return x; }
-    int Y() { return y; }
+    int X() const { return x; }
+    int Y() const { return y; }
 };
 
