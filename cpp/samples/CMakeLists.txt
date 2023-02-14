@@ -23,6 +23,7 @@ foreach(path ${path_list})
     get_filename_component(target_name ${path} NAME_WE)
 
     add_executable(${target_name} ${path})
+    target_compile_features(${target_name} PUBLIC cxx_std_17)
     target_compile_options(${target_name} PUBLIC
             # 各種警告
             -Wall -Wextra -Wshadow -Wconversion -Wfloat-equal -Wno-char-subscripts
@@ -31,9 +32,7 @@ foreach(path ${path_list})
             # デバッグ情報付与
             $<$<CONFIG:Debug>: -g>
             # 最適化
-            $<$<CONFIG:Release>: -mtune=native -march=native -mfpmath=both -O2>
-            )
-    target_compile_features(${target_name} PUBLIC cxx_std_17)
+            $<$<CONFIG:Release>: -mtune=native -march=native -mfpmath=both -O2>)
 
     link_directories(${target_name} PUBLIC ${PCL_LIBRARY_DIRS})
     target_include_directories(${target_name} PUBLIC

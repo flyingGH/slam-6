@@ -8,7 +8,7 @@ from visual_odometry import PinholeCamera, VisualOdometry
 
 
 def main():
-    root_path = "D:/datasets/KITTI/odometry"
+    root_path = "/mnt/d/datasets/KITTI/odometry"
     cam = PinholeCamera(width=1241.0, height=376.0, fx=718.8560, fy=718.8560, cx=607.1928, cy=185.2157)
     vo = VisualOdometry(cam, f'{root_path}/poses/00.txt')
 
