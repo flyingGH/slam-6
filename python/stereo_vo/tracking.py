@@ -4,6 +4,8 @@ import operator
 import numpy as np
 import cv2
 
+from config import config
+
 _detector = cv2.ORB_create()
 _matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
@@ -61,8 +63,7 @@ def direct_tracking(image_1: np.ndarray, image_2: np.ndarray,
     """
     if not key_points_1:
         # params for Shi-Tomasi corner detection
-        feature_params = dict(maxCorners=100, qualityLevel=0.3, minDistance=7, blockSize=7)
-        key_points_1 = cv2.goodFeaturesToTrack(image_1, mask=None, **feature_params)
+        key_points_1 = cv2.goodFeaturesToTrack(image_1, mask=None, **config["to_track"])
         key_points_1 = np.array([point[0] for point in key_points_1])
     # parameters for optical flow
     lk_params = dict(winSize=(21, 21),

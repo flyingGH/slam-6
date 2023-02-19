@@ -5,19 +5,12 @@ import numpy as np
 import cv2
 from typing import Tuple
 
+from config import config
+
 # image processing mode
 STAGE_FIRST_FRAME = 0
 STAGE_SECOND_FRAME = 1
 STAGE_DEFAULT_FRAME = 2
-
-# minimum keypoint number to refresh
-kMinNumFeature = 1500
-
-# parameters for optical flow
-lk_params = dict(winSize=(21, 21),
-                 # maxLevel = 3,
-                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01))
-
 
 def feature_tracking(image_ref: np.ndarray, image_cur: np.ndarray, px_ref: np.ndarray)\
         -> Tuple[np.ndarray, np.ndarray]:
@@ -30,7 +23,8 @@ def feature_tracking(image_ref: np.ndarray, image_cur: np.ndarray, px_ref: np.nd
     :return: start points and end points of optical flow
     """
     # shape: [k,2] [k,1] [k,1]
-    kp2, st, err = cv2.calcOpticalFlowPyrLK(image_ref, image_cur, prevPts=px_ref, nextPts=None, **lk_params)
+    kp2, st, err = cv2.calcOpticalFlowPyrLK(
+        image_ref, image_cur, prevPts=px_ref, nextPts=None, **config["lk_params"])
 
     # bool list for optical flow (same length with px_ref)
     st = st.reshape(st.shape[0])
@@ -162,7 +156,7 @@ class VisualOdometry:
             self.cur_R = rot_mat.dot(self.cur_R)
 
         # get additional feature points if remaining are not enough
-        if self.px_ref.shape[0] < kMinNumFeature:
+        if self.px_ref.shape[0] < config["kMinNumFeature"]:
             self.px_cur = self.detector.detect(self.new_frame)
             self.px_cur = np.array([x.pt for x in self.px_cur], dtype=np.float32)
 

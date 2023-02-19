@@ -7,6 +7,7 @@ if(NOT DEFINED CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
 endif()
 
 find_package(glog 0.5.0 REQUIRED)
+# for slicing (https://eigen.tuxfamily.org/dox-devel/group__TutorialSlicingIndexing.html)
 find_package(Eigen3 REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(OpenCV REQUIRED)

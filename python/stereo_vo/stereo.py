@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import open3d as o3d
 
+from config import config
+
 
 def pixel2point(u, v, disparity, calib_mat):
     x = (u - calib_mat[0, 2]) / calib_mat[0, 0]
@@ -17,7 +19,7 @@ def triangulation(left_key_points, right_key_points, calib_matrix):
     landmarks = np.array([pixel2point(*left_pt, left_pt[0] - right_pt[0], calib_matrix)
                           for left_pt, right_pt in zip(left_key_points, right_key_points)])
 
-    is_valid = np.where((10 <= disparity) & (disparity <= 96), True, False)
+    is_valid = np.where((config["disparity_min"] <= disparity) & (disparity <= config["disparity_max"]), True, False)
     left_key_points = [left_key_points[idx] for idx, valid in enumerate(is_valid) if valid]
     right_key_points = [right_key_points[idx] for idx, valid in enumerate(is_valid) if valid]
     return left_key_points, right_key_points, landmarks[is_valid]
@@ -25,11 +27,7 @@ def triangulation(left_key_points, right_key_points, calib_matrix):
 
 class StereoEstimator:
     def __init__(self):
-        self.disparity_estimator = cv2.StereoSGBM_create(
-            minDisparity=0, numDisparities=96, blockSize=9,
-            P1=8 * 9 * 9, P2=32 * 9 * 9,
-            disp12MaxDiff=1, preFilterCap=63, uniquenessRatio=10,
-            speckleWindowSize=100, speckleRange=32)
+        self.disparity_estimator = cv2.StereoSGBM_create(**config["stereo_sgbm"])
 
     def get_disparity(self, left_image, right_image):
         disparity_image = self.disparity_estimator.compute(left_image, right_image)

@@ -1,3 +1,8 @@
+
+if (Test-Path ) {
+
+}
+
 # conda 有効化
 Invoke-Expression -Command $env:UserProfile\miniforge3\shell\condabin\conda-hook.ps1
 conda activate py38pip

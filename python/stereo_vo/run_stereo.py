@@ -16,7 +16,7 @@ def read_calib_matrices(calib_path):
 
 
 def demo_stereo_matching():
-    root_path = "/mnt/d/datasets/KITTI/odometry"
+    root_path = config["root_path"]
     left_image_path = os.path.join(root_path, "sequences/00/image_0/000000.png")
     right_image_path = os.path.join(root_path, "sequences/00/image_1/000000.png")
 
