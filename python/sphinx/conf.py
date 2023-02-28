@@ -41,7 +41,18 @@ language = 'ja'
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-# LuaLaTeXを使用
-latex_engine = 'lualatex'
-# LaTeXドキュメントクラスとしてltjsbookを使用
-latex_docclass = {'manual': 'ltjsarticle'}
+# # LuaLaTeXを使用
+# latex_engine = 'lualatex'
+# # LaTeXドキュメントクラスとしてltjsbookを使用
+# latex_docclass = {'manual': 'ltjsarticle'}
+
+latex_preamble = R'''
+\usepackage{xltxtra}
+\setmainfont{TakaoMincho}
+\setsansfont{TakaoGothic}
+\setmonofont{TakaoGothic}
+\XeTeXlinebreaklocale "ja"
+'''
+latex_elements = {
+    'extraclassoptions': 'openany',
+}

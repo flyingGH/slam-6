@@ -1,8 +1,3 @@
-
-if (Test-Path ) {
-
-}
-
 # conda 有効化
 Invoke-Expression -Command $env:UserProfile\miniforge3\shell\condabin\conda-hook.ps1
 conda activate py38pip
@@ -33,5 +28,6 @@ sphinx-build -a $ScriptDir\sphinx $ScriptDir\docs
 #if (-Not(Get-Command latexmk -ea SilentlyContinue)) {
 #    sudo choco install texlive -y
 #}
-#Set-Location $ScriptDir\sphinx
-#make latexpdf
+Set-Location $ScriptDir\sphinx
+make latexpdfja
+Set-Location $ScriptDir
