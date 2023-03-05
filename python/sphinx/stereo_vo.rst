@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   stereo_vo.config
    stereo_vo.landmark
    stereo_vo.run_stereo
    stereo_vo.stereo

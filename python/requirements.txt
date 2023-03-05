@@ -1,5 +1,7 @@
 numpy
 pandas
+matplotlib
+numba
 
 opencv-python
 open3d
