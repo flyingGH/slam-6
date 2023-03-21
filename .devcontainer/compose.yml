@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  slam:
+    image: local/slam:ubuntu20.04
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    tty: true
+    restart: always
+
+    volumes:
+      # リポジトリ全体をマウント.
+      # Dev Container で commit 可能. push はログイン情報が必要なので host 側で.
+      - ../:/workspace
