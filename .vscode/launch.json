@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C++ Debug",
+      "name": "mono-vo",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "program": "${workspaceRoot}/build/cpp/mono-vo/vo",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
@@ -22,7 +22,6 @@
           "ignoreFailures": true
         },
       ],
-      "preLaunchTask": "GCC Build"
     },
   ]
 }

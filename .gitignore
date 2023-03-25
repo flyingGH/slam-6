@@ -247,3 +247,4 @@ cython_debug/
 
 docs/
 _build/
+datasets/

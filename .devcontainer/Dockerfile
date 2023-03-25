@@ -42,7 +42,7 @@ WORKDIR "${PIP_DIR}/pangolin/build"
 RUN cmake .. && make -j"$(nproc)"
 RUN sed -i "s/install_dirs/install_dir/g" "${PIP_DIR}/pangolin/setup.py"
 WORKDIR "${PIP_DIR}"
-RUN pip install "${PIP_DIR}/pangolin"
+RUN pip install -e "${PIP_DIR}/pangolin"
 
 # g2opy
 RUN apt-get update && \
@@ -53,7 +53,7 @@ RUN mkdir "${PIP_DIR}/g2opy/build"
 WORKDIR "${PIP_DIR}/g2opy/build"
 RUN cmake .. && make -j"$(nproc)"
 WORKDIR "${PIP_DIR}"
-RUN pip install "${PIP_DIR}/g2opy"
+RUN pip install -e "${PIP_DIR}/g2opy"
 
 #-------------#
 # C++ Builder #
@@ -127,15 +127,6 @@ RUN cmake .. && make -j"$(nproc)" && make install
 WORKDIR $HOME
 RUN rm -rf "$HOME/Sophus"
 
-# # pybind11
-# RUN apt-get update && apt-get install -y python3.8 python3-pip
-# RUN git clone https://github.com/pybind/pybind11.git -b v2.10.4
-# RUN mkdir "$HOME/pybind11/build"
-# WORKDIR "$HOME/pybind11/build"
-# RUN cmake .. && make -j"$(nproc)" && make install
-# WORKDIR "$HOME"
-# RUN rm -rf "$HOME/pybind11"
-
 # ceres-solver
 RUN apt-get update && \
       apt-get install -y libatlas-base-dev libsuitesparse-dev
@@ -155,6 +146,15 @@ WORKDIR "$HOME/g2o/build"
 RUN cmake .. && make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/g2o"
+
+# pybind11
+RUN apt-get update && apt-get install -y python3.8 python3-pip
+RUN git clone https://github.com/pybind/pybind11.git -b v2.10.4
+RUN mkdir "$HOME/pybind11/build"
+WORKDIR "$HOME/pybind11/build"
+RUN cmake .. && make -j"$(nproc)" && make install
+WORKDIR "$HOME"
+RUN rm -rf "$HOME/pybind11"
 
 # PCL
 # RUN apt-get install -y libusb-1.0-0-dev libflann-dev libvtk7-dev libpcap-dev
@@ -200,9 +200,11 @@ RUN pip3 install numpy
 COPY gdbinit.sh "$HOME/.gdbinit"
 COPY gdb/ "$HOME/gdb/"
 
-# matplotlib-cpp
+# Python
 RUN apt-get update && \
       apt-get install -y python3.8 python3-pip python3-matplotlib python3-numpy python3-dev wget
+
+# matplotlib-cpp
 RUN wget https://github.com/lava/matplotlib-cpp/raw/master/matplotlibcpp.h -P /usr/local/include
 
 # libboost-"all"-dev is needed for PCL
@@ -212,10 +214,25 @@ RUN apt-get update && apt-get install -y \
 COPY --from=pip-installer /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
 COPY --from=pip-installer /usr/local/bin /usr/local/bin
 
+# Pangolin
+RUN apt-get update && \
+      apt-get install -y libglew-dev libpython2.7-dev libeigen3-dev
+# g2opy
+RUN apt-get update && \
+      apt-get install -y libsuitesparse-dev qtdeclarative5-dev libqglviewer-dev-qt5
 COPY --from=python-builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
 COPY --from=python-builder /usr/local/bin /usr/local/bin
 
-COPY --from=cpp-builder /usr/local/bin /usr/local/bin
+# ceres-solver
+RUN apt-get update && \
+      apt-get install -y libatlas-base-dev libsuitesparse-dev
+# g2o
+RUN apt-get update && \
+      apt-get install -y libsuitesparse-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5
+COPY --from=cpp-builder /usr/local/bin /usr/local/bin      
+COPY --from=cpp-builder /usr/local/include /usr/local/include
+COPY --from=cpp-builder /usr/local/lib /usr/local/lib
+COPY --from=cpp-builder /usr/local/share /usr/local/share
 
 RUN apt-get clean && \ 
       rm -rf /var/lib/apt/lists/*

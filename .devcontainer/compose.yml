@@ -6,10 +6,12 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      target: runner
     tty: true
     restart: always
-
+ 
     volumes:
       # リポジトリ全体をマウント.
       # Dev Container で commit 可能. push はログイン情報が必要なので host 側で.
       - ../:/workspace
+      - D:/datasets/KITTI/odometry:/workspace/datasets/KITTI
