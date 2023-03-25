@@ -1,25 +1,69 @@
-FROM ubuntu:20.04
+#-----#
+# Pip #
+#-----#
+
+#cf. https://qiita.com/XPT60/items/e123fe88ec88a4ac2749
+
+FROM ubuntu:20.04 AS pip-installer
+
+ENV DEBIAN_FRONTEND="noninteractive" 
+RUN apt-get update && \
+      apt-get install -y python3.8 python3-pip \
+      git gcc cmake
 
 ENV HOME /root
+WORKDIR "${HOME}"
+
+COPY requirements.txt "${HOME}"
+RUN pip install -r requirements.txt
+RUN rm "${HOME}/requirements.txt"
+
+#--------#
+# Python #
+#--------#
+
+FROM ubuntu:20.04 AS python-builder
+
+ENV DEBIAN_FRONTEND="noninteractive" 
+RUN apt-get update && \
+      apt-get install -y python3.8 python3-pip \
+      git gcc cmake
+
+ENV PIP_DIR /usr/local/lib/python3.8/dist-packages
+WORKDIR "${PIP_DIR}"
+
+# Pangolin
+RUN apt-get update && \
+      apt-get install -y libglew-dev libpython2.7-dev libeigen3-dev
+# Bug fixed PR version
+RUN git clone https://github.com/bravech/pangolin "${PIP_DIR}/pangolin"
+RUN mkdir "${PIP_DIR}/pangolin/build"
+WORKDIR "${PIP_DIR}/pangolin/build"
+RUN cmake .. && make -j"$(nproc)"
+RUN sed -i "s/install_dirs/install_dir/g" "${PIP_DIR}/pangolin/setup.py"
+WORKDIR "${PIP_DIR}"
+RUN pip install "${PIP_DIR}/pangolin"
+
+# g2opy
+RUN apt-get update && \
+      apt-get install -y libsuitesparse-dev qtdeclarative5-dev libqglviewer-dev-qt5
+# Bug fixed PR version
+RUN git clone https://github.com/codegrafix/g2opy.git "${PIP_DIR}/g2opy"
+RUN mkdir "${PIP_DIR}/g2opy/build"
+WORKDIR "${PIP_DIR}/g2opy/build"
+RUN cmake .. && make -j"$(nproc)"
+WORKDIR "${PIP_DIR}"
+RUN pip install "${PIP_DIR}/g2opy"
+
+#-------------#
+# C++ Builder #
+#-------------#
+
+FROM ubuntu:20.04 AS cpp-builder-base
+
+ENV DEBIAN_FRONTEND="noninteractive" 
+ENV HOME /root
 WORKDIR "$HOME"
-
-#--------------#
-# Localization #
-#--------------#
-
-RUN apt-get update && apt-get upgrade -y
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y tzdata
-ENV TZ=Asia/Tokyo
-
-RUN apt-get install -y locales fonts-takao && locale-gen ja_JP.UTF-8
-ENV LANG=ja_JP.UTF-8
-ENV LANGUAGE=ja_JP:ja
-ENV LC_ALL=ja_JP.UTF-8
-RUN localedef -f UTF-8 -i ja_JP ja_JP.utf8
-
-#-----------#
-# Dev Tools #
-#-----------#
 
 # Install CMake 3.21.6 for g2o
 # CLion supports CMake 2.8.11~3.21.x
@@ -36,16 +80,12 @@ RUN apt-get update && \
       gcc g++ gdb clang make \
       ninja-build autoconf automake \
       locales-all dos2unix rsync tar
-RUN apt-get update && \
-      apt-get install -y python3.8 python3-pip
 
-#---------------#
-# Source Builds #
-#---------------#
+#----------#
+# C++ Libs #
+#----------#
 
-# libboost-dev is not enough for PCL
-RUN apt-get update && \
-      apt-get install -y libboost-all-dev
+FROM cpp-builder-base AS cpp-builder
 
 # glog
 RUN git clone https://github.com/google/glog.git -b v0.5.0
@@ -79,6 +119,23 @@ RUN cmake .. && make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/eigen"
 
+# Sophus
+RUN git clone https://github.com/strasdat/Sophus.git -b 1.22.10
+RUN mkdir "$HOME/Sophus/build"
+WORKDIR "$HOME/Sophus/build"
+RUN cmake .. && make -j"$(nproc)" && make install
+WORKDIR $HOME
+RUN rm -rf "$HOME/Sophus"
+
+# # pybind11
+# RUN apt-get update && apt-get install -y python3.8 python3-pip
+# RUN git clone https://github.com/pybind/pybind11.git -b v2.10.4
+# RUN mkdir "$HOME/pybind11/build"
+# WORKDIR "$HOME/pybind11/build"
+# RUN cmake .. && make -j"$(nproc)" && make install
+# WORKDIR "$HOME"
+# RUN rm -rf "$HOME/pybind11"
+
 # ceres-solver
 RUN apt-get update && \
       apt-get install -y libatlas-base-dev libsuitesparse-dev
@@ -99,21 +156,6 @@ RUN cmake .. && make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/g2o"
 
-# Sophus
-RUN git clone https://github.com/strasdat/Sophus.git -b 1.22.10
-RUN mkdir "$HOME/Sophus/build"
-WORKDIR "$HOME/Sophus/build"
-RUN cmake .. && make -j"$(nproc)" && make install
-WORKDIR $HOME
-RUN rm -rf "$HOME/Sophus"
-
-# matplotlib-cpp
-RUN apt-get update && \
-      apt-get install -y python3-matplotlib python3-numpy python3-dev wget
-RUN wget https://github.com/lava/matplotlib-cpp/raw/master/matplotlibcpp.h -P /usr/local/include
-
-RUN apt-get install -y libopencv-dev
-
 # PCL
 # RUN apt-get install -y libusb-1.0-0-dev libflann-dev libvtk7-dev libpcap-dev
 # RUN git clone https://github.com/PointCloudLibrary/pcl.git -b pcl-1.12.1
@@ -122,21 +164,34 @@ RUN apt-get install -y libopencv-dev
 # RUN cmake .. && make -j"$(nproc)" && make install
 # WORKDIR "$HOME"
 # RUN rm -rf "$HOME/pcl"
-RUN apt-get update && \
-      apt-get install -y libpcl-dev
 
-# pybind11
-RUN git clone https://github.com/pybind/pybind11.git -b v2.10.4
-RUN mkdir "$HOME/pybind11/build"
-WORKDIR "$HOME/pybind11/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+#--------#
+# runner #
+#--------#
+
+FROM cpp-builder-base AS runner
+
+ENV HOME /root
 WORKDIR "$HOME"
-RUN rm -rf "$HOME/pybind11"
 
-#--------------#
-# gdb printers #
-#--------------#
+# Localization
+ENV DEBIAN_FRONTEND="noninteractive"
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=Asia/Tokyo
+RUN apt-get install -y locales fonts-takao && locale-gen ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8
+ENV LANGUAGE=ja_JP:ja
+ENV LC_ALL=ja_JP.UTF-8
+RUN localedef -f UTF-8 -i ja_JP ja_JP.utf8
 
+# VNC
+RUN apt-get update && \
+      apt-get install -y lxde \
+      tigervnc-standalone-server tigervnc-common \
+      novnc websockify
+
+# gdb printers
 # for OpenCV Mat debugger
 RUN apt-get update && \
       apt-get install -y python3-pip
@@ -145,37 +200,22 @@ RUN pip3 install numpy
 COPY gdbinit.sh "$HOME/.gdbinit"
 COPY gdb/ "$HOME/gdb/"
 
-#-------------#
-# Python libs #
-#-------------#
-
-# Pangolin
+# matplotlib-cpp
 RUN apt-get update && \
-      apt-get install -y libglew-dev libpython2.7-dev libeigen3-dev
-# Bug fixed PR version
-RUN git clone https://github.com/bravech/pangolin "$HOME/pangolin"
-RUN mkdir "$HOME/pangolin/build"
-WORKDIR "$HOME/pangolin/build"
-RUN cmake .. && make -j"$(nproc)"
-RUN sed -i "s/install_dirs/install_dir/g" "$HOME/pangolin/setup.py"
-WORKDIR "$HOME/pangolin"
-RUN python3 setup.py install
-WORKDIR "$HOME"
+      apt-get install -y python3.8 python3-pip python3-matplotlib python3-numpy python3-dev wget
+RUN wget https://github.com/lava/matplotlib-cpp/raw/master/matplotlibcpp.h -P /usr/local/include
 
-# g2opy
-RUN apt-get update && \
-      apt-get install -y libsuitesparse-dev qtdeclarative5-dev libqglviewer-dev-qt5
-# Bug fixed PR version
-RUN git clone https://github.com/codegrafix/g2opy.git "$HOME/g2opy"
-RUN mkdir "$HOME/g2opy/build"
-WORKDIR "$HOME/g2opy/build"
-RUN cmake .. && make -j"$(nproc)"
-WORKDIR "$HOME/g2opy"
-RUN python3 setup.py install
-WORKDIR "$HOME"
+# libboost-"all"-dev is needed for PCL
+RUN apt-get update && apt-get install -y \
+      libboost-all-dev  libopencv-dev libpcl-dev
 
-COPY requirements.txt "$HOME"
-RUN pip install -r requirements.txt
+COPY --from=pip-installer /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
+COPY --from=pip-installer /usr/local/bin /usr/local/bin
+
+COPY --from=python-builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
+COPY --from=python-builder /usr/local/bin /usr/local/bin
+
+COPY --from=cpp-builder /usr/local/bin /usr/local/bin
 
 RUN apt-get clean && \ 
       rm -rf /var/lib/apt/lists/*

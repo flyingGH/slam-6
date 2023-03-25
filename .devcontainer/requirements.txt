@@ -1,10 +1,12 @@
 numpy
-numba
 pandas
-dask
 scipy
 scikit-learn
 matplotlib
+
+numba
+dask
+pybind11
 
 # for JetBrains IDE syntax highlighting
 # cf. https://github.com/opencv/opencv/issues/20997#issuecomment-1176523621
