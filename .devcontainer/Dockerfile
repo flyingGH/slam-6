@@ -4,7 +4,7 @@
 
 #cf. https://qiita.com/XPT60/items/e123fe88ec88a4ac2749
 
-FROM ubuntu:20.04 AS pip-installer
+FROM amd64/ubuntu:20.04 AS pip-installer
 
 ENV DEBIAN_FRONTEND="noninteractive" 
 RUN apt-get update && \
@@ -22,7 +22,7 @@ RUN rm "${HOME}/requirements.txt"
 # Python #
 #--------#
 
-FROM ubuntu:20.04 AS python-builder
+FROM amd64/ubuntu:20.04 AS python-builder
 
 ENV DEBIAN_FRONTEND="noninteractive" 
 RUN apt-get update && \
@@ -59,7 +59,7 @@ RUN pip install -e "${PIP_DIR}/g2opy"
 # C++ Builder #
 #-------------#
 
-FROM ubuntu:20.04 AS cpp-builder-base
+FROM amd64/ubuntu:20.04 AS cpp-builder-base
 
 ENV DEBIAN_FRONTEND="noninteractive" 
 ENV HOME /root
