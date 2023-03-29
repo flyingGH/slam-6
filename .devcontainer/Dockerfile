@@ -87,19 +87,12 @@ RUN apt-get update && \
 
 FROM cpp-builder-base AS cpp-builder
 
-# glog
-RUN git clone https://github.com/google/glog.git -b v0.5.0
-RUN mkdir "$HOME/glog/build"
-WORKDIR "$HOME/glog/build"
-RUN cmake .. && make -j"$(nproc)" && make install
-WORKDIR "$HOME"
-RUN rm -rf "$HOME/glog"
-
 # gflags    
 RUN git clone https://github.com/gflags/gflags.git -b v2.2.2
 RUN mkdir "$HOME/gflags/build"
 WORKDIR "$HOME/gflags/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF ..
+RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/gflags"
 
@@ -107,43 +100,57 @@ RUN rm -rf "$HOME/gflags"
 RUN git clone https://github.com/google/googletest.git -b release-1.11.0
 RUN mkdir "$HOME/googletest/build"
 WORKDIR "$HOME/googletest/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release ..
+RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/googletest"
+
+# glog (depends gflags and gtest)
+RUN git clone https://github.com/google/glog.git -b v0.5.0
+RUN mkdir "$HOME/glog/build"
+WORKDIR "$HOME/glog/build"
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF ..
+RUN make -j"$(nproc)" && make install
+WORKDIR "$HOME"
+RUN rm -rf "$HOME/glog"
 
 # Eigen
 RUN git clone https://gitlab.com/libeigen/eigen.git -b 3.4.0
 RUN mkdir "$HOME/eigen/build"
 WORKDIR "$HOME/eigen/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING ..
+RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/eigen"
 
-# Sophus
-RUN git clone https://github.com/strasdat/Sophus.git -b 1.22.10
-RUN mkdir "$HOME/Sophus/build"
-WORKDIR "$HOME/Sophus/build"
-RUN cmake .. && make -j"$(nproc)" && make install
-WORKDIR $HOME
-RUN rm -rf "$HOME/Sophus"
-
-# ceres-solver
+# ceres-solver (depends gflags and Eigen)
 RUN apt-get update && \
       apt-get install -y libatlas-base-dev libsuitesparse-dev
 RUN git clone https://github.com/ceres-solver/ceres-solver.git -b 2.1.0
 RUN mkdir "$HOME/ceres-solver/build"
 WORKDIR "$HOME/ceres-solver/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
+RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/ceres-solver"
 
-# g2o
+# Sophus (depends Eigen and Ceres-Solver)
+RUN git clone https://github.com/strasdat/Sophus.git -b 1.22.10
+RUN mkdir "$HOME/Sophus/build"
+WORKDIR "$HOME/Sophus/build"
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SOPHUS_EXAMPLES=OFF -DBUILD_SOPHUS_TESTS=OFF .. 
+RUN make -j"$(nproc)" && make install
+WORKDIR $HOME
+RUN rm -rf "$HOME/Sophus"
+
+# g2o (depends Eigen)
 RUN apt-get update && \
       apt-get install -y libsuitesparse-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5
 RUN git clone https://github.com/RainerKuemmerle/g2o.git -b 20230223_git
 RUN mkdir "$HOME/g2o/build"
 WORKDIR "$HOME/g2o/build"
-RUN cmake .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DG2O_BUILD_EXAMPLES=OFF ..
+RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/g2o"
 
@@ -198,7 +205,7 @@ RUN apt-get update && \
 RUN pip3 install numpy
 # Place gdb scripts
 COPY gdbinit.sh "$HOME/.gdbinit"
-COPY gdb/ "$HOME/gdb/"
+COPY gdb/ "$HOME/.gdb/"
 
 # Python
 RUN apt-get update && \

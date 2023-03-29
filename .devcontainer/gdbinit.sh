@@ -18,4 +18,4 @@ sys.path.extend(paths)
 
 end
 
-source /root/gdb/opencv_gdb.py
+source "$HOME"/.gdb/opencv_gdb.py
