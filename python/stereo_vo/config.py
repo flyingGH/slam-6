@@ -1,10 +1,14 @@
+"""
+設定ファイル
+"""
+
 config = {
     "root_path": "/mnt/d/datasets/KITTI/odometry",
     "to_track": {
         "maxCorners": 100,
         "qualityLevel": 0.3,
         "minDistance": 7,
-        "blockSize":7
+        "blockSize": 7
     },
     "stereo_sgbm": {
         "minDisparity": 0,

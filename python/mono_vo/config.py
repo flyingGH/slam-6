@@ -1,3 +1,6 @@
+"""
+設定ファイル
+"""
 import cv2
 
 config = {

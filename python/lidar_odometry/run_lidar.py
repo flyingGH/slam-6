@@ -1,13 +1,15 @@
+"""
+LiDAR SLAM 実行モジュール
+"""
 import os
 import glob
 
 import numpy as np
 import open3d as o3d
 
-from config import config
+from .config import config
 
-import features
-import pcd_io
+from . import features, pcd_io
 
 
 def sigmoid(x, alpha: float = 10):
@@ -18,7 +20,8 @@ def update_pcd(lidar_file: str, pcd: o3d.geometry.PointCloud) -> None:
     lidar_data = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 4)
 
     pcd.points = o3d.utility.Vector3dVector(lidar_data[:, :3])
-    pcd.colors = o3d.utility.Vector3dVector(np.tile(lidar_data[:, 3], (3, 1)).T)
+    pcd.colors = o3d.utility.Vector3dVector(
+        np.tile(lidar_data[:, 3], (3, 1)).T)
 
 
 def main():
@@ -29,10 +32,14 @@ def main():
     vis.create_window()
 
     pcd = pcd_io.read_pcd(lidar_files[0])
-    sharp_edges, less_sharp_edges, planes = features.get_features(pcd, draw=False)
-    edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile((1, 0, 0), (sharp_edges.shape[0], 1)))
-    less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile((0, 1, 0), (less_sharp_edges.shape[0], 1)))
-    plane_pcd = pcd_io.ndarray2pcd(planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
+    sharp_edges, less_sharp_edges, planes = features.get_features(
+        pcd, draw=False)
+    edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile(
+        (1, 0, 0), (sharp_edges.shape[0], 1)))
+    less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile(
+        (0, 1, 0), (less_sharp_edges.shape[0], 1)))
+    plane_pcd = pcd_io.ndarray2pcd(
+        planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
 
     vis.add_geometry(pcd)
     vis.add_geometry(edge_pcd)
@@ -44,10 +51,14 @@ def main():
 
     for lidar_file in lidar_files[1:]:
         update_pcd(lidar_file, pcd)
-        sharp_edges, less_sharp_edges, planes = features.get_features(pcd, draw=False)
-        edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile((1, 0, 0), (sharp_edges.shape[0], 1)))
-        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile((0, 1, 0), (less_sharp_edges.shape[0], 1)))
-        plane_pcd = pcd_io.ndarray2pcd(planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
+        sharp_edges, less_sharp_edges, planes = features.get_features(
+            pcd, draw=False)
+        edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile(
+            (1, 0, 0), (sharp_edges.shape[0], 1)))
+        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile(
+            (0, 1, 0), (less_sharp_edges.shape[0], 1)))
+        plane_pcd = pcd_io.ndarray2pcd(
+            planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
 
         vis.update_geometry(pcd)
         vis.update_geometry(edge_pcd)

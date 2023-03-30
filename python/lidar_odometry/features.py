@@ -1,3 +1,6 @@
+"""
+特徴点(エッジ・平面)計算モジュール
+"""
 import copy
 from typing import List, Tuple
 
@@ -5,8 +8,8 @@ import numpy as np
 from numba import njit
 import open3d as o3d
 
-from config import config
-import pcd_io
+from .config import config
+from . import pcd_io
 
 
 def _get_curvature(scan: np.ndarray, draw: bool = False) -> np.ndarray:
@@ -19,7 +22,8 @@ def _get_curvature(scan: np.ndarray, draw: bool = False) -> np.ndarray:
     :return:
     """
     diff = np.array([
-        np.sum(np.roll(scan, shift=-(i - 5), axis=0)[0:11, :], axis=0) - 10 * scan[i, :]
+        np.sum(np.roll(scan, shift=-(i - 5), axis=0)
+               [0:11, :], axis=0) - 10 * scan[i, :]
         for i in range(scan.shape[0])])
     curvature = np.linalg.norm(diff, axis=1) ** 2
 
@@ -114,11 +118,15 @@ def _get_features_per_scan(scan: np.ndarray, draw: bool = False) -> np.ndarray:
 
     if draw:
         pcd = pcd_io.ndarray2pcd(data[:, :3], np.zeros_like(data[:, :3]))
-        edge_pcd = pcd_io.ndarray2pcd(sharp_edge, np.tile((1, 0, 0), (sharp_edge.shape[0], 1)))
-        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edge, np.tile((0, 1, 0), (less_sharp_edge.shape[0], 1)))
-        plane_pcd = pcd_io.ndarray2pcd(planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
+        edge_pcd = pcd_io.ndarray2pcd(sharp_edge, np.tile(
+            (1, 0, 0), (sharp_edge.shape[0], 1)))
+        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edge, np.tile(
+            (0, 1, 0), (less_sharp_edge.shape[0], 1)))
+        plane_pcd = pcd_io.ndarray2pcd(
+            planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
 
-        o3d.visualization.draw_geometries([pcd, plane_pcd, less_edge_pcd, edge_pcd])
+        o3d.visualization.draw_geometries(
+            [pcd, plane_pcd, less_edge_pcd, edge_pcd])
     return sharp_edge, less_sharp_edge, planes
 
 
@@ -135,10 +143,14 @@ def get_features(pcd: o3d.geometry.PointCloud, draw: bool = False):
     planes = np.vstack([feature[2] for feature in features])
 
     if draw:
-        edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile((1, 0, 0), (sharp_edges.shape[0], 1)))
-        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile((0, 1, 0), (less_sharp_edges.shape[0], 1)))
-        plane_pcd = pcd_io.ndarray2pcd(planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
+        edge_pcd = pcd_io.ndarray2pcd(sharp_edges, np.tile(
+            (1, 0, 0), (sharp_edges.shape[0], 1)))
+        less_edge_pcd = pcd_io.ndarray2pcd(less_sharp_edges, np.tile(
+            (0, 1, 0), (less_sharp_edges.shape[0], 1)))
+        plane_pcd = pcd_io.ndarray2pcd(
+            planes, np.tile((0, 0, 1), (planes.shape[0], 1)))
 
-        o3d.visualization.draw_geometries([pcd, plane_pcd, less_edge_pcd, edge_pcd])
+        o3d.visualization.draw_geometries(
+            [pcd, plane_pcd, less_edge_pcd, edge_pcd])
 
     return sharp_edges, less_sharp_edges, planes

@@ -1,11 +1,11 @@
 """
-from https://github.com/uoip/monoVO-python
+単眼 Visual Odometry 実行スクリプト
 """
 import numpy as np
 import cv2
 
-from visual_odometry import PinholeCamera, VisualOdometry
-from config import config
+from .visual_odometry import PinholeCamera, VisualOdometry
+from .config import config
 
 
 def main():
@@ -40,9 +40,11 @@ def main():
         cv2.circle(traj, (draw_x, draw_y), radius=1,
                    color=(img_id * 255 / 4540, 255 - img_id * 255 / 4540, 0), thickness=1)
         # true trajectory (larger line & red)
-        cv2.circle(traj, (true_x, true_y), radius=1, color=(0, 0, 255), thickness=2)
+        cv2.circle(traj, (true_x, true_y), radius=1,
+                   color=(0, 0, 255), thickness=2)
         # background color (black)
-        cv2.rectangle(traj, pt1=(10, 20), pt2=(600, 60), color=(0, 0, 0), thickness=-1)
+        cv2.rectangle(traj, pt1=(10, 20), pt2=(600, 60),
+                      color=(0, 0, 0), thickness=-1)
 
         # put text (white) from upper left side of the trajectory window
         text = f"Coordinates: x={x:2f}m y={y:2f}m z={z:2f}m"

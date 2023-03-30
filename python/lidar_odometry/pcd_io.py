@@ -1,9 +1,12 @@
+"""
+点群変換処理モジュール
+"""
 from typing import List
 
 import numpy as np
 import open3d as o3d
 
-from config import config
+from .config import config
 
 
 def read_pcd(lidar_file: str) -> o3d.geometry.PointCloud:
@@ -11,7 +14,8 @@ def read_pcd(lidar_file: str) -> o3d.geometry.PointCloud:
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(lidar_data[:, :3])
-    pcd.colors = o3d.utility.Vector3dVector(np.tile(lidar_data[:, 3], (3, 1)).T)
+    pcd.colors = o3d.utility.Vector3dVector(
+        np.tile(lidar_data[:, 3], (3, 1)).T)
 
     return pcd
 

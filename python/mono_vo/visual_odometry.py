@@ -1,26 +1,28 @@
 """
-from https://github.com/uoip/monoVO-python
+| 単眼 Visual Odometry (Wheel Odometry 利用)
+| from https://github.com/uoip/monoVO-python
 """
 import numpy as np
 import cv2
 from typing import Tuple
 
-from config import config
+from .config import config
 
 # image processing mode
 STAGE_FIRST_FRAME = 0
 STAGE_SECOND_FRAME = 1
 STAGE_DEFAULT_FRAME = 2
 
+
 def feature_tracking(image_ref: np.ndarray, image_cur: np.ndarray, px_ref: np.ndarray)\
         -> Tuple[np.ndarray, np.ndarray]:
     """
-    calc optical flow
+    optical flow を計算
 
-    :param image_ref: previous image mat
-    :param image_cur: current image mat
-    :param px_ref: feature points of previous image
-    :return: start points and end points of optical flow
+    :param image_ref: 直前の画像
+    :param image_cur: 現在の画像
+    :param px_ref: 直前の画像の特徴点
+    :return: optical flow の始点・終点
     """
     # shape: [k,2] [k,1] [k,1]
     kp2, st, err = cv2.calcOpticalFlowPyrLK(
@@ -37,6 +39,10 @@ def feature_tracking(image_ref: np.ndarray, image_cur: np.ndarray, px_ref: np.nd
 
 
 class PinholeCamera:
+    """
+    ピンホールカメラモデルのパラメータ
+    """
+
     def __init__(self, width, height, fx, fy, cx, cy,
                  k1=0.0, k2=0.0, p1=0.0, p2=0.0, k3=0.0):
         self.width = width
@@ -58,6 +64,7 @@ class VisualOdometry:
     """
     visual odometry by sparce direct method (use feature points & optical flow)
     """
+
     def __init__(self, cam, annotations):
         """
         :param cam: inner camera model parameters
@@ -75,7 +82,8 @@ class VisualOdometry:
         self.pp = (cam.cx, cam.cy)
         self.trueX, self.trueY, self.trueZ = 0, 0, 0
 
-        self.detector = cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)
+        self.detector = cv2.FastFeatureDetector_create(
+            threshold=25, nonmaxSuppression=True)
 
         with open(annotations) as f:
             self.annotations = f.readlines()
@@ -116,7 +124,8 @@ class VisualOdometry:
         get optical flow and apply 5-point algorithm
         """
         # get optical flow
-        self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
+        self.px_ref, self.px_cur = feature_tracking(
+            self.last_frame, self.new_frame, self.px_ref)
 
         # e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
         #                                    prob=0.999, threshold=1.0)
@@ -139,7 +148,8 @@ class VisualOdometry:
         :param frame_id:
         :return:
         """
-        self.px_ref, self.px_cur = feature_tracking(self.last_frame, self.new_frame, self.px_ref)
+        self.px_ref, self.px_cur = feature_tracking(
+            self.last_frame, self.new_frame, self.px_ref)
         # e_mat, mask = cv2.findEssentialMat(self.px_cur, self.px_ref, focal=self.focal, pp=self.pp, method=cv2.RANSAC,
         #                                    prob=0.999, threshold=1.0)
         e_mat, mask = cv2.findEssentialMat(
@@ -158,7 +168,8 @@ class VisualOdometry:
         # get additional feature points if remaining are not enough
         if self.px_ref.shape[0] < config["kMinNumFeature"]:
             self.px_cur = self.detector.detect(self.new_frame)
-            self.px_cur = np.array([x.pt for x in self.px_cur], dtype=np.float32)
+            self.px_cur = np.array(
+                [x.pt for x in self.px_cur], dtype=np.float32)
 
         self.px_ref = self.px_cur
 

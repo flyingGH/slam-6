@@ -11,6 +11,7 @@ Welcome to slam-practice's documentation!
    :caption: Contents:
 
    link_readme
+   lidar_odometry
    mono_vo
    stereo_vo
 
