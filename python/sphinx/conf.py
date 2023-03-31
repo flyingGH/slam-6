@@ -21,6 +21,7 @@ extensions = [
     # docstring 使用
     "sphinx.ext.autodoc",
     # ソースコードへの link を追加
+    # ビルドが止まることがあるため注意 (その場合は一旦コメントアウトする)
     "sphinx.ext.viewcode",
     # 各種図生成
     "sphinx.ext.graphviz",
@@ -29,6 +30,17 @@ extensions = [
     # Markdown 対応
     "sphinx_mdinclude"
 ]
+
+# 型ヒントを有効
+autodoc_typehints = 'description'
+# __init__()も出力
+autoclass_content = 'both'
+autodoc_default_options = {
+    # プライベートメソッドも出力
+    'private-members': True,
+    # 継承を表示
+    'show-inheritance': True
+}
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

@@ -7,3 +7,4 @@ python
    lidar_odometry
    mono_vo
    stereo_vo
+   utils
