@@ -7,9 +7,10 @@ int main(__attribute__((unused)) int argc, char* argv[]) {
   FLAGS_log_dir = "../log";
   // glog の初期化
   google::InitGoogleLogging(argv[0]);
-  // クラッシュ時にスタックトレースを吐くうシグナルハンドラを設定
+  // クラッシュ時にスタックトレースを吐くシグナルハンドラを設定
   google::InstallFailureSignalHandler();
 
+  // ログ保存フォルダを指定(マクロは何故かうまく設定できない)
   google::SetLogDestination(google::INFO, "./logs/");
   google::SetLogDestination(google::WARNING, "./logs/");
   google::SetLogDestination(google::ERROR, "./logs/");
