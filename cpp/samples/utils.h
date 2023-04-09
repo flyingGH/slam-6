@@ -21,7 +21,7 @@ class Timer {
     const auto dur = end - _start_time;
     const auto msec =
         std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-    // 出力
+    // インスタンス破棄時に結果出力
     std::cout << "[" << _description << "]: " << msec << " ms\n";
   }
 
@@ -52,6 +52,7 @@ class Config {
     }
   }
 
+  /** 設定ファイルの内容全てを string に出力 */
   std::string get_config_all() {
     std::stringstream ss;
     boost::property_tree::write_ini(ss, _pt);
@@ -68,19 +69,21 @@ class Config {
 /** static 変数は初期化が必要 */
 boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
 
-// /**
-//  * std::vectorは非virtual destructorを持つためprotected継承する
-//  * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
-//  */
-// template <class T>
-// class PBar : protected std::vector<T> {
-//  public:
-//   void print() {
-//     for (const auto& elem : this) {
-//       std::cout << elem << std::endl;
-//     }
-//     return;
-//   }
-// };
+/**
+ * std::vectorは非virtual destructorを持つためprotected継承する
+ * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
+ */
+template <typename T>
+class PBar : private std::vector<T, std::allocator<T>> {
+ public:
+  PBar(std::vector<T> x) : std::vector<T>(x){};
+
+  void print() {
+    for (const auto& elem : this) {
+      std::cout << elem << std::endl;
+    }
+    return;
+  }
+};
 
 }  // namespace utils
