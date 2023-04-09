@@ -9,9 +9,19 @@ services:
       target: runner
     tty: true
     restart: always
- 
+
     volumes:
+      # GUI for WSLg
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /mnt/wslg:/mnt/wslg
       # リポジトリ全体をマウント.
       # Dev Container で commit 可能. push はログイン情報が必要なので host 側で.
       - ../:/workspace
       - D:/datasets/KITTI/odometry:/workspace/datasets/KITTI
+      
+    environment:
+      # GUI for WSLg
+      - DISPLAY=$DISPLAY
+      - WAYLAND_DISPLAY=$WAYLAND_DISPLAY
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+      - PULSE_SERVER=$PULSE_SERVER
