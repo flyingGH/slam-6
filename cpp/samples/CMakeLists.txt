@@ -49,7 +49,8 @@ foreach(path ${path_list})
             ${OpenCV_LIBS}
             ${PCL_LIBRARIES}
             Ceres::ceres
-            g2o_core g2o_stuff
+            # cf. /usr/loca/lib/cmake/g2o/g2oTargets.cmake
+            g2o::core g2o::solver_dense g2o::stuff
             # for matplotlibcpp
             ${PYTHON_LIBRARIES})
 endforeach()
