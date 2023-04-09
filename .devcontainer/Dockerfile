@@ -151,7 +151,7 @@ RUN apt-get update && \
 RUN git clone https://github.com/RainerKuemmerle/g2o.git -b 20230223_git
 RUN mkdir "$HOME/g2o/build"
 WORKDIR "$HOME/g2o/build"
-RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENMP=ON ..
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENMP=OFF ..
 RUN make -j"$(nproc)" && make install
 WORKDIR "$HOME"
 RUN rm -rf "$HOME/g2o"
