@@ -166,15 +166,21 @@ int main() {
 
     // プロット1: 測定データ(散布図)
     {
-      // フォーマット指定
-      std::map<std::string, std::string> scatter_map;
-      scatter_map["c"] = "gray";
-      plt::scatter(x_data, y_obs_data, 2.0, scatter_map);
+      // 実装：https://github.com/lava/matplotlib-cpp/blob/ef0383f1315d32e0156335e10b82e90b334f6d9f/matplotlibcpp.h#L993
+      constexpr double s = 2.0;
+      std::map<std::string, std::string> options = {{"c", "gray"},
+                                                    {"label", "measurements"}};
+      plt::scatter(x_data, y_obs_data, s, options);
     }
 
-    // プロット2: 正解(線形補間)
-    // cf. https://matplotlib.org/stable/tutorials/colors/colors.html
-    plt::plot(x_data, y_true_data, "tab:blue");
+    // プロット2：正解(線形補間)
+    {
+      // 実装：https://github.com/lava/matplotlib-cpp/blob/ef0383f1315d32e0156335e10b82e90b334f6d9f/matplotlibcpp.h#L442
+      // 色一覧：https://matplotlib.org/stable/tutorials/colors/colors.html
+      std::map<std::string, std::string> options = {{"c", "tab:blue"},
+                                                    {"label", "true form"}};
+      plt::plot(x_data, y_true_data, options);
+    }
 
     // プロット3: 推定結果(線形補間)
     {
@@ -184,9 +190,12 @@ int main() {
       std::vector<double> y_est_data;
       for (const auto &x : x_data) y_est_data.push_back(y_est(x));
 
-      plt::plot(x_data, y_est_data, "tab:orange");
+      std::map<std::string, std::string> options = {
+          {"c", "tab:orange"}, {"label", "estimated form"}};
+      plt::plot(x_data, y_est_data, options);
     }
 
+    plt::legend();
     plt::show();
   }
 
