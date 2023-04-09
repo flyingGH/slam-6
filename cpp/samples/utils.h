@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-namespace util {
+namespace utils {
 /**
  * @brief タイマークラス. ローカルスコープ内で使用して処理時間を計測.
  */
@@ -21,6 +21,7 @@ class Timer {
     const auto dur = end - _start_time;
     const auto msec =
         std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+    // 出力
     std::cout << "[" << _description << "]: " << msec << " ms\n";
   }
 
@@ -67,19 +68,19 @@ class Config {
 /** static 変数は初期化が必要 */
 boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
 
-/**
- * std::vectorは非virtual destructorを持つためprotected継承する
- * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
- */
-template <class T>
-class PBar : protected std::vector<T> {
- public:
-  void print() {
-    for (const auto& elem : this) {
-      std::cout << elem << std::endl;
-    }
-    return;
-  }
-};
+// /**
+//  * std::vectorは非virtual destructorを持つためprotected継承する
+//  * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
+//  */
+// template <class T>
+// class PBar : protected std::vector<T> {
+//  public:
+//   void print() {
+//     for (const auto& elem : this) {
+//       std::cout << elem << std::endl;
+//     }
+//     return;
+//   }
+// };
 
-}  // namespace util
+}  // namespace utils

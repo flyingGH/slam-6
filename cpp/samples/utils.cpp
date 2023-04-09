@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-using util::Config;
+using utils::Config;
 
 int main() {
   const std::string config_path =
@@ -11,7 +11,7 @@ int main() {
   const auto hoge = Config::get_config<uint>("test.hoge");
   const auto fuga = Config::get_config<std::string>("test.fuga");
 
-  const auto pbar = util::PBar<double>({1, 2, 3, 4, 5});
+  // const auto pbar = utils::PBar<double>({1, 2, 3, 4, 5});
 
   return 0;
 }

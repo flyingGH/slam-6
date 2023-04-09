@@ -150,7 +150,7 @@ int main() {
 
   // 最適化実施
   {
-    util::Timer("Optimization");
+    utils::Timer("Optimization");
     solver.initializeOptimization();
     const uint max_iter_num = 10;
     solver.optimize(max_iter_num);
@@ -195,6 +195,7 @@ int main() {
       plt::plot(x_data, y_est_data, options);
     }
 
+    plt::title("Curve fitting by g2o autodiff");
     plt::legend();
     plt::show();
   }
