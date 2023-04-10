@@ -74,12 +74,24 @@ boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
  * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
  */
 template <typename T>
-class PBar : private std::vector<T, std::allocator<T>> {
+class PBar : private std::vector<T> {
  public:
   PBar(std::vector<T> x) : std::vector<T>(x){};
 
+  class iterator : private std::vector<T>::iterator {
+   public:
+    iterator& operator++() {
+      auto tmp = (std::vector<T>::iterator&)(*this);
+      ++tmp;
+      return *this;
+    }
+  };
+
+  using std::vector<T>::begin;
+  using std::vector<T>::end;
+
   void print() {
-    for (const auto& elem : this) {
+    for (const auto& elem : *this) {
       std::cout << elem << std::endl;
     }
     return;

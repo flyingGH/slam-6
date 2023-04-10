@@ -14,5 +14,9 @@ int main() {
   auto pbar = utils::PBar<double>({1, 2, 3, 4, 5});
   pbar.print();
 
+  for (const auto& elem : pbar) {
+    std::cout << elem << std::endl;
+  }
+
   return 0;
 }

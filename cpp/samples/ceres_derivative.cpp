@@ -1,5 +1,5 @@
 /**
- * from
+ * from http://ceres-solver.org/nnls_modeling.html#autodiffcostfunction
  */
 #include <ceres/ceres.h>
 #include <matplotlibcpp.h>

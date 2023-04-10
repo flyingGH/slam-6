@@ -70,7 +70,7 @@ WORKDIR "$HOME"
 # Install CMake 3.21.6 for g2o
 # CLion supports CMake 2.8.11~3.21.x
 RUN apt-get update && \
-      apt-get install -y git build-essential libssl-dev
+      apt-get install -y git build-essential libssl-dev libncurses5-dev
 RUN git clone https://gitlab.kitware.com/cmake/cmake.git -b v3.21.6
 RUN mkdir "$HOME/cmake/build"
 WORKDIR "$HOME/cmake/build"
