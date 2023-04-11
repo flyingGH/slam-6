@@ -11,10 +11,9 @@ int main() {
   const auto fuga = Config::get_config<std::string>("test.fuga");
   std::cout << "test.fuga=" << fuga << std::endl;
 
-  auto pbar = utils::PBar<double>({1, 2, 3, 4, 5});
-  pbar.print();
+  const auto vector = std::vector<double>({1, 2, 3, 4, 5});
 
-  for (const auto& elem : pbar) {
+  for (const auto& elem : utils::PBar(vector)) {
     std::cout << elem << std::endl;
   }
 

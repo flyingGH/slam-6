@@ -4,6 +4,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -65,37 +66,76 @@ class Config {
   Config() = default;
   ~Config() = default;
 };
+}  // namespace utils
 
+namespace utils {
 /** static 変数は初期化が必要 */
 boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
 
+void print_gauge(double x) {
+  std::cout << std::setfill('0') << std::right << std::setw(2) << int(x * 100)
+            << "%|";
+  for (uint i = 0; i < 20; ++i) {
+    if (double(i) / 20. < x) {
+      std::cout << "█";
+    } else {
+      std::cout << " ";
+    }
+  }
+  std::cout << "|" << std::endl;
+}
+
 /**
- * std::vectorは非virtual destructorを持つためprotected継承する
- * cf. https://mahou-ptr.hatenablog.com/entry/2017/12/05/163120
+ * cf. https://gist.github.com/jeetsukumaran/307264
  */
 template <typename T>
-class PBar : private std::vector<T> {
+class PBar {
  public:
-  PBar(std::vector<T> x) : std::vector<T>(x){};
-
-  class iterator : private std::vector<T>::iterator {
+  class iterator {
    public:
-    iterator& operator++() {
-      auto tmp = (std::vector<T>::iterator&)(*this);
-      ++tmp;
+    iterator(T* ptr, int size) : _ptr(ptr), _size(size) {}
+
+    T& operator*() { return *_ptr; }
+    iterator operator++() {
+      iterator i = *this;
+      _ptr++;
+      print_gauge(double(_counter) / double(_size));
+      const auto curr_time = std::chrono::system_clock::now();
+
+      _pre_time = curr_time;
+      _counter++;
+      return i;
+    }
+    iterator operator++(int junk) {
+      _ptr++;
+
+      const auto curr_time = std::chrono::system_clock::now();
+      _pre_time = curr_time;
+      _counter++;
       return *this;
     }
+    bool operator==(const iterator& rhs) { return _ptr == rhs._ptr; }
+    bool operator!=(const iterator& rhs) { return _ptr != rhs._ptr; }
+
+   private:
+    T* _ptr;
+    int _size;
+    int _counter{0};
+    std::chrono::system_clock::time_point _pre_time;
+    std::time_t total_time{0};
   };
 
-  using std::vector<T>::begin;
-  using std::vector<T>::end;
-
-  void print() {
-    for (const auto& elem : *this) {
-      std::cout << elem << std::endl;
-    }
-    return;
+  PBar(int size) : _size(size) { _data = new T[_size]; }
+  PBar(const std::vector<T>& vec) : _size(vec.size()) {
+    _data = new T[_size];
+    for (int i = 0; i < _size; i++) _data[i] = vec[i];
   }
+  iterator begin() { return iterator(_data, _size); }
+  iterator end() { return iterator(_data + _size, _size); }
+
+ private:
+  T* _data;
+  int _size;
 };
 
 }  // namespace utils
