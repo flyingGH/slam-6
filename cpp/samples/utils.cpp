@@ -15,6 +15,7 @@ int main() {
 
   for (const auto& elem : utils::PBar(vector)) {
     std::cout << elem << std::endl;
+    sleep(1);
   }
 
   return 0;

@@ -66,15 +66,14 @@ class Config {
   Config() = default;
   ~Config() = default;
 };
+
+/** static 変数は初期化が必要 */
+boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
 }  // namespace utils
 
 namespace utils {
-/** static 変数は初期化が必要 */
-boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
-
 void print_gauge(double x) {
-  std::cout << std::setfill('0') << std::right << std::setw(2) << int(x * 100)
-            << "%|";
+  std::cout << std::right << std::setw(3) << int(x * 100) << "%|";
   for (uint i = 0; i < 20; ++i) {
     if (double(i) / 20. < x) {
       std::cout << "█";
@@ -82,7 +81,7 @@ void print_gauge(double x) {
       std::cout << " ";
     }
   }
-  std::cout << "|" << std::endl;
+  std::cout << "|";
 }
 
 /**
@@ -93,17 +92,47 @@ class PBar {
  public:
   class iterator {
    public:
-    iterator(T* ptr, int size) : _ptr(ptr), _size(size) {}
+    iterator(T* ptr, int size)
+        : _ptr(ptr),
+          _size(size),
+          _start_time(std::chrono::system_clock::now()) {}
 
     T& operator*() { return *_ptr; }
     iterator operator++() {
       iterator i = *this;
       _ptr++;
-      print_gauge(double(_counter) / double(_size));
+      _counter++;
+
       const auto curr_time = std::chrono::system_clock::now();
+      const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+          curr_time - _start_time);
+      const auto total_s = std::chrono::duration_cast<std::chrono::seconds>(
+                               curr_time - _start_time)
+                               .count();
+      const auto curr_s = total_s % 60;
+      const auto curr_m = int(total_s / 60);
+      const auto remain_s =
+          int(total_s * double(_size - _counter) / double(_counter));
+      const auto est_s = remain_s % 60;
+      const auto est_m = int(remain_s / 60);
+
+      // gauge progress
+      print_gauge(double(_counter) / double(_size));
+      // iteration number progress
+      std::cout << " " << _counter << "/" << _size;
+      // current time consumption
+      std::cout << " [" << std::setfill('0') << std::right << std::setw(2)
+                << curr_m << ":" << std::setfill('0') << std::right
+                << std::setw(2) << curr_s << "<";
+      // estimated remaining time consumption
+      std::cout << std::setfill('0') << std::right << std::setw(2) << est_m
+                << ":" << std::setfill('0') << std::right << std::setw(2)
+                << est_s << ",  ";
+      std::cout << std::fixed << std::setprecision(2)
+                << double(ms.count()) * 1e-3 / double(_counter) << "s/it]"
+                << std::endl;
 
       _pre_time = curr_time;
-      _counter++;
       return i;
     }
     iterator operator++(int junk) {
@@ -121,6 +150,7 @@ class PBar {
     T* _ptr;
     int _size;
     int _counter{0};
+    std::chrono::system_clock::time_point _start_time;
     std::chrono::system_clock::time_point _pre_time;
     std::time_t total_time{0};
   };
