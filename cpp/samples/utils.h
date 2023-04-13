@@ -73,7 +73,9 @@ boost::property_tree::ptree Config::_pt = boost::property_tree::ptree();
 
 namespace utils {
 void print_gauge(double x) {
-  std::cout << std::right << std::setw(3) << int(x * 100) << "%|";
+  std::cout << "\r" << std::setfill(' ') << std::right << std::setw(3)
+            << int(x * 100) << "%|";
+
   for (uint i = 0; i < 20; ++i) {
     if (double(i) / 20. < x) {
       std::cout << "█";
@@ -98,6 +100,7 @@ class PBar {
           _start_time(std::chrono::system_clock::now()) {}
 
     T& operator*() { return *_ptr; }
+
     iterator operator++() {
       iterator i = *this;
       _ptr++;
@@ -128,13 +131,15 @@ class PBar {
       std::cout << std::setfill('0') << std::right << std::setw(2) << est_m
                 << ":" << std::setfill('0') << std::right << std::setw(2)
                 << est_s << ",  ";
+      // average time consumption for each time consumptions
       std::cout << std::fixed << std::setprecision(2)
                 << double(ms.count()) * 1e-3 / double(_counter) << "s/it]"
-                << std::endl;
+                << std::flush;
 
       _pre_time = curr_time;
       return i;
     }
+
     iterator operator++(int junk) {
       _ptr++;
 
@@ -143,6 +148,7 @@ class PBar {
       _counter++;
       return *this;
     }
+
     bool operator==(const iterator& rhs) { return _ptr == rhs._ptr; }
     bool operator!=(const iterator& rhs) { return _ptr != rhs._ptr; }
 
@@ -160,6 +166,7 @@ class PBar {
     _data = new T[_size];
     for (int i = 0; i < _size; i++) _data[i] = vec[i];
   }
+  ~PBar() { std::cout << std::endl; }
   iterator begin() { return iterator(_data, _size); }
   iterator end() { return iterator(_data + _size, _size); }
 

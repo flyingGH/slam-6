@@ -14,7 +14,7 @@ int main() {
   const auto vector = std::vector<double>({1, 2, 3, 4, 5});
 
   for (const auto& elem : utils::PBar(vector)) {
-    std::cout << elem << std::endl;
+    // std::cout << elem << std::endl;
     sleep(1);
   }
 
