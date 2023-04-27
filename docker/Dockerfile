@@ -103,10 +103,10 @@ RUN rm -rf /root/"$REPO_NAME"
 
 # Eigen3
 ARG REPO_NAME="eigen"
-RUN git clone https://gitlab.com/libeigen/eigen.git -b 3.4-rc1 \
+RUN git clone https://gitlab.com/libeigen/eigen.git -b 3.4.0 \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. \
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF .. \
       && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
@@ -121,7 +121,8 @@ ARG REPO_NAME="ceres-solver"
 RUN git clone https://github.com/ceres-solver/ceres-solver.git -b 2.1.0 \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
@@ -137,7 +138,8 @@ ARG REPO_NAME="g2o"
 RUN git clone https://github.com/RainerKuemmerle/g2o.git \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF - .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
@@ -146,7 +148,8 @@ ARG REPO_NAME="Sophus"
 RUN git clone https://github.com/strasdat/Sophus.git \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SOPHUS_EXAMPLES=OFF -DBUILD_SOPHUS_TESTS=OFF .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
@@ -162,7 +165,8 @@ ARG REPO_NAME="pcl"
 RUN git clone https://github.com/PointCloudLibrary/pcl.git -b pcl-1.12.1 \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
@@ -190,7 +194,8 @@ ARG REPO_NAME="Sophus"
 RUN git clone https://github.com/isl-org/Open3D.git -b v0.17.0 \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
@@ -198,7 +203,8 @@ RUN rm -rf /root/"$REPO_NAME"
 RUN git clone https://github.com/pybind/pybind11.git \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
+RUN cmake -DCMAKE_BUILD_TYPE=Release .. \
+      && make -j"$(nproc)" && make install
 WORKDIR /root
 
 # matplotlib-cpp
