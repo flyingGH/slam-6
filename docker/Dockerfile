@@ -138,7 +138,7 @@ ARG REPO_NAME="g2o"
 RUN git clone https://github.com/RainerKuemmerle/g2o.git \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF - .. \
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF .. \
       && make -j"$(nproc)" && make install
 WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
@@ -190,7 +190,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libosmesa6-dev=21.2.6-0ubuntu0.1~20.04.2 \
       && apt-get clean \
       && rm -rf /var/lib/apt/lists/*
-ARG REPO_NAME="Sophus"
+ARG REPO_NAME="Open3D"
 RUN git clone https://github.com/isl-org/Open3D.git -b v0.17.0 \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
@@ -200,6 +200,7 @@ WORKDIR /root
 RUN rm -rf /root/"$REPO_NAME"
 
 # pybind11
+ARG REPO_NAME="pybind11"
 RUN git clone https://github.com/pybind/pybind11.git \
       && mkdir /root/"$REPO_NAME"/build
 WORKDIR /root/"$REPO_NAME"/build
